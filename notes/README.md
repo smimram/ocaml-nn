@@ -62,8 +62,11 @@ functions, we have
 so that $$\frac{\partial E}{\partial w_i}=(y-\overline y)y(1-y)x_i$$
 
 In order to minimize the error, we use a gradient descent and add, to each $w_i$
-the quantity $$\Delta w_i=-\eta\frac{\partial E}{\partial w_i}=-\eta (y-\overline
-y)y(1-y)x_i$$ where $\eta$ is the _learning rate_.
+the quantity
+$$
+\Delta w_i=-\eta\frac{\partial E}{\partial w_i}=-\eta (y-\overline y)y(1-y)x_i
+$$
+where $\eta$ is the _learning rate_.
 
 ## For a neural network
 
