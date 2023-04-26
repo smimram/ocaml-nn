@@ -51,9 +51,11 @@ typically use $$E=\frac 12(y-\overline y)^2$$ which is the square
 of the euclidean norm up to a factor $1/2$.
 
 We want to minimize this error, by tweaking the coefficients $w_i$. We thus
-compute $$\frac{\partial E}{\partial w_i}=\frac{\partial E}{\partial
-y}\frac{\partial y}{\partial x}\frac{\partial x}{\partial w_i}$$ With the usual
-functions, we have
+compute
+$$
+\frac{\partial E}{\partial w_i}=\frac{\partial E}{\partial y}\frac{\partial y}{\partial x}\frac{\partial x}{\partial w_i}
+$$
+With the usual functions, we have
 
 - $\frac{\partial E}{\partial y}=(y-\overline y)$ (the derivative of the square)
 - $\frac{\partial y}{\partial x}=y(1-y)$ (the derivative of the sigmoid function)
