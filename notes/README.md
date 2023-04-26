@@ -5,7 +5,6 @@ toc: true
 papersize: a4
 header-includes:
 - \newcommand{\ce}{\mathrm{e}}
-- \newcommand{\ol}{\overline}
 ---
 
 # [Q-learning](https://en.wikipedia.org/wiki/Q-learning)
@@ -47,8 +46,8 @@ $$\psi'(x)=1-\tanh^2(x)$$
 This is basically the same since
 $$\phi(x)=(1+\psi(x/2))/2$$
 On a given input, suppose that we have an output $y$ whereas the expected output
-was $\ol y$. The error is $$E=L(y,\ol y)$$ where $L$ is the used norm. We
-typically use $$E=\frac 12(y-\ol y)^2$$ which is the square
+was $\overline y$. The error is $$E=L(y,\overline y)$$ where $L$ is the used norm. We
+typically use $$E=\frac 12(y-\overline y)^2$$ which is the square
 of the euclidean norm up to a factor $1/2$.
 
 We want to minimize this error, by tweaking the coefficients $w_i$. We thus
@@ -56,14 +55,14 @@ compute $$\frac{\partial E}{\partial w_i}=\frac{\partial E}{\partial
 y}\frac{\partial y}{\partial x}\frac{\partial x}{\partial w_i}$$ With the usual
 functions, we have
 
-- $\frac{\partial E}{\partial y}=(y-\ol y)$ (the derivative of the square)
+- $\frac{\partial E}{\partial y}=(y-\overline y)$ (the derivative of the square)
 - $\frac{\partial y}{\partial x}=y(1-y)$ (the derivative of the sigmoid function)
 - $\frac{\partial x}{\partial w_i}=x_i$
 
-so that $$\frac{\partial E}{\partial w_i}=(y-\ol y)y(1-y)x_i$$
+so that $$\frac{\partial E}{\partial w_i}=(y-\overline y)y(1-y)x_i$$
 
 In order to minimize the error, we use a gradient descent and add, to each $w_i$
-the quantity $$\Delta w_i=-\eta\frac{\partial E}{\partial w_i}=-\eta (y-\ol
+the quantity $$\Delta w_i=-\eta\frac{\partial E}{\partial w_i}=-\eta (y-\overline
 y)y(1-y)x_i$$ where $\eta$ is the _learning rate_.
 
 ## For a neural network
@@ -82,7 +81,7 @@ $$
 y^{k+1}_j=\phi(x^k_j)
 $$
 
-The error we want to minimize is $$E=\frac 12\sum_j(y^n_j-\ol y^n_j)^2$$ and we
+The error we want to minimize is $$E=\frac 12\sum_j(y^n_j-\overline y^n_j)^2$$ and we
 thus compute
 $$
 \frac{\partial E}{\partial w^k_{ij}}
@@ -100,7 +99,7 @@ $$
 =\frac{\partial E}{\partial x^{n-1}_j}
 =\sum_{j'}\frac{\partial E}{\partial y^n_{j'}}\frac{\partial y^n_{j'}}{\partial x^{n-1}_j}
 =\frac{\partial E}{\partial y^n_j}\frac{\partial y^n_j}{\partial x^{n-1}_j}
-=(y^n_j-\ol y^n_j)y^n_j(1-y^n_j)
+=(y^n_j-\overline y^n_j)y^n_j(1-y^n_j)
 $$
 And the inductive step is
 $$
