@@ -1,4 +1,8 @@
-open Nn
+(* Basic tests. *)
+let () =
+  let nn = Network.create [1;6;3;2] in
+  ignore (Network.propagate nn (Matrix.of_list [0.1]));
+  ignore (Network.backpropagate nn (Matrix.of_list [0.1]) (Matrix.of_list [0.2;0.3]))
 
 (* Learn f(x) = x². *)
 let () =
