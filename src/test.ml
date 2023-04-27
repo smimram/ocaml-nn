@@ -8,8 +8,8 @@ let () =
   in
   let nn = Network.fit
       ~layers:[6] 
-      ~eps:1e-5
-      ~iter:100_000 
+      ~precision:1e-5
+      ~iterations:100_000 
       ~rate:0.2
       dataset 
   in

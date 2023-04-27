@@ -47,9 +47,13 @@ module Matrix = struct
   (** Create a vector from a list. *)
   let of_list l =
     transpose [|Array.of_list l|]
+
+  let to_list a =
+    assert (cols a = 1);
+    (transpose a).(0) |> Array.to_list
   
   (** Sum of f i for i from 0 to n - 1. *)
-  let rec sum n f =
+  let sum n f =
     let rec aux x i =
       if i >= n then x
       else aux (x +. f i) (i + 1)
@@ -128,9 +132,9 @@ module Network = struct
     in
     aux nn (propagate nn x) |> snd
 
-  (** Perform gradient descent. *)
-  let descent nn rate x o : t =
-    List.map2 (fun w dy -> w #- (rate #* dy)) nn (backpropagate nn x o)
+  (** Perform gradient descent (computed from [nn] and affecting [nn']). *)
+  let descent (nn:t) (nn':t) rate x o : t =
+    List.map2 (fun w dy -> w #- (rate #. dy)) nn' (backpropagate nn x o)
 
   (** Compute mean error on given dataset. *)
   let error nn data =
@@ -155,17 +159,15 @@ module Network = struct
     let rec loop i nn =
       if i >= iterations || error nn data <= precision then nn
       else
-        let rec batch_loop rem cur acc =
-          if rem <= 0
-          then acc
-          else
-            let add_weights w1 w2 = List.map2 add_mat_mat w1 w2 in
-            let dw = backward_propagation t dataset.(cur) in
-            let acc = add_weights acc (List.map (scale_mat rate) dw) in
-            batch_loop (rem - 1) ((cur + 1) mod n) acc
-        in
-        let t = {t with w = batch_loop g cur t.w} in
-        loop t (iters - 1) ((cur + g) mod n)
+        let nn = List.fold_left (fun nn' (x,o) -> descent nn nn' rate x o) nn data in
+        loop (i+1) nn
     in
     loop 0 nn
+
+  let predict nn x =
+    x
+    |> M.of_list
+    |> propagate nn
+    |> List.last
+    |> M.to_list
 end
