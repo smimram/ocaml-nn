@@ -14,6 +14,7 @@ module M = Matrix
 let ( #@ ) = M.mul
 let ( #* ) = M.hadamard
 let ( #. ) = M.cmul
+let ( #+ ) = M.add
 let ( #- ) = M.sub
 
 (** A network is a list of layers encoded as wji being the weight from the
@@ -21,13 +22,14 @@ let ( #- ) = M.sub
 type t = Matrix.t list
 
 (** Number of inputs of a nn. *)
-let inputs (nn:t) = Matrix.cols (List.hd nn)
+let inputs (nn:t) = M.src (List.hd nn)
 
 (** Create a networks with given number of links for each layer. *)
 let create layers : t =
   let rec aux n = function
     | l::layers ->
-      let w = Matrix.init l n (fun _ _ -> Random.float 2. -. 1.) in
+      let w = M.init l n (fun _ _ -> Random.float 2. -. 1.) in
+      assert (M.src w = n && M.tgt w = l);
       w :: aux l layers
     | [] -> []
   in
@@ -42,29 +44,29 @@ let rec propagate (nn:t) x =
 (** Backpropagate to compute the δ. [x] is the input and [o] is the expected
     output. *)
 let backpropagate (nn:t) x o =
+  (* The function returns for each step the last δ and the list of products
+     δy. *)
   let rec aux nn yy =
     match nn, yy with
     | [], [y] ->
-      (* Printf.printf "last y: %dx%d\n%!" (M.rows y) (M.cols y); *)
       let d = (y #- o) #* y #* (M.map (fun x -> 1. -. x) y) in
-      (* Printf.printf "last d: %dx%d\n%!" (M.rows d) (M.cols d); *)
+      assert (M.src d = 1 && M.tgt d = M.tgt y);
       d, []
     | w::nn, y::yy ->
       let d, ddy = aux nn yy in
-      (* Printf.printf "y: %dx%d\n%!" (M.rows y) (M.cols y); *)
-      (* Printf.printf "d: %dx%d\n%!" (M.rows d) (M.cols d); *)
-      (* Printf.printf "w: %dx%d\n%!" (M.rows w) (M.cols w); *)
-      let d = ((M.transpose w) #@ d) #* y #* (M.map (fun x -> 1. -. x) y) in
-      (* Printf.printf "d': %dx%d\n%!" (M.rows d) (M.cols d); *)
+      assert (M.src d = 1);
+      let d' = (M.transpose ((M.transpose d) #@ w)) #* y #* (M.map (fun x -> 1. -. x) y) in
+      assert (M.src d = 1 && M.tgt d = M.tgt w);
       let dy = d #@ (M.transpose y) in
-      d, dy::ddy
+      assert (M.dims dy = M.dims w);
+      d', dy::ddy
     | _ -> assert false
   in
   aux nn (propagate nn x) |> snd
 
 (** Perform gradient descent (computed from [nn] and affecting [nn']). *)
 let descent (nn:t) (nn':t) rate x o : t =
-  List.map2 (fun w dy -> w #- (rate #. dy)) nn' (backpropagate nn x o)
+  List.map2 (fun w dy -> w #+ ((-.rate) #. dy)) nn' (backpropagate nn x o)
 
 (** Compute mean error on given dataset. *)
 let error nn data =

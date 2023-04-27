@@ -23,6 +23,15 @@ let rows (a:t) = Array.length a
 (** Number of columns. *)
 let cols (a:t) = Array.length a.(0)
 
+let dims a = rows a, cols a
+
+let src = cols
+
+let tgt = rows
+
+let print_dims s a =
+  Printf.printf "%s: %dx%d\n%!" s (rows a) (cols a)
+
 let to_scalar a =
   assert (rows a = 1);
   assert (cols a = 1);
