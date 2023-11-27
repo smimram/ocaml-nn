@@ -93,13 +93,13 @@ $$\phi'(x^k_i)=\phi(x^k_i)(1-\phi'(x^k_i))=y^{k+1}_i(1-y^{k+1}_i)$$
 
 Once the $y^k_i$ are computed, we can thus compute the $\delta^k_i$ by
 "propagating backwards", i.e. computing the $\delta^n_i$, the $\delta^{n-1}_i$,
-..., up to the $\delta^0_i$, and the change in $w^k_{ij}$ should be
-$$\Delta w^k_{ij}=-\eta\frac{\partial E}{\partial w^k_{ij}}=-\eta\delta^k_jy^k_i$$
+..., up to the $\delta^0_i$, and the change in $w^k_ {ij}$ should be
+$$\Delta w^k_ {ij}=-\eta\frac{\partial E}{\partial w^k_ {ij}}=-\eta\delta^k_jy^k_i$$
 
 ## Bias
 
 If we consider neural networks with bias
-$$y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i+b^k_j)$$
+$$y^{k+1}_ j=\phi(\sum_i w^k_ {ij}y^k_ i+b^k_ j)$$
 we need to optimize those. This can be achieved in the same way, computing that
 $$\frac{\partial E}{\partial b^k_i}=\delta^k_i$$
 and thus
