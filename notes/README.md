@@ -76,7 +76,10 @@ $$y^{k+1}_j=\phi(x^k_j)$$
 The error we want to minimize is
 $$E=\frac 12\sum_j(y^n_j-\overline y^n_j)^2$$
 and we thus compute
-$$\frac{\partial E}{\partial w^k_{ij}}=\sum_{j'}\frac{\partial E}{\partial x^k_{j'}}\frac{\partial x^k_{j'}}{\partial w^k_{ij}}=\frac{\partial E}{\partial x^k_j}y^k_i=\delta^k_jy^k_i$$
+$$\frac{\partial E}{\partial w^k_{ij}}
+=\sum_{j'}\frac{\partial E}{\partial x^k_{j'}}\frac{\partial x^k_{j'}}{\partial w^k_{ij}}
+=\frac{\partial E}{\partial x^k_j}y^k_i
+=\delta^k_jy^k_i$$
 with
 $$\delta^k_j=\frac{\partial E}{\partial x^k_j}$$
 The first step is
@@ -91,9 +94,7 @@ $$\delta^k_i
 =\sum_{j}\frac{\partial E}{\partial x^{k+1}_j}\frac{\partial x^{k+1}_j}{\partial x^k_{i}}
 =\sum_{j}\delta^{k+1}_jw^k_{ij}\phi'(x^k_i)$$
 Namely, $x^{k+1}_j=\sum_i w^k_{ij}\phi(x^k_i)$ implies
-$$\frac{\partial x^{k+1}_j}{\partial x^k_i}
-=
-w^k_{ij}y^k_i(1-y^k_i)$$
+$$\frac{\partial x^{k+1}_j}{\partial x^k_i}=w^k_{ij}y^k_i(1-y^k_i)$$
 In the case of the sigmoid function, this can be further simplified by
 $$
 \phi'(x^k_i)=\phi(x^k_i)(1-\phi'(x^k_i))=y^{k+1}_i(1-y^{k+1}_i)
