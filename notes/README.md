@@ -28,14 +28,10 @@ parameters are
 
 A _neuron_ gives an output $y$ depending on a bunch of inputs $x_i$. The formula
 is 
-$$
-y=\phi(\sum_i w_ix_i)=\phi(x)
-$$
+$$y=\phi(\sum_i w_ix_i)=\phi(x)$$
 where $\phi$ is an _activation function_ which basically returns $0$ or $1$ depending on whether its input is below or above $0.5$ (some people also add an offset called _bias_ to the sum, see below)
 and
-$$
-x=\sum_iw_ix_i
-$$
+$$x=\sum_iw_ix_i$$
 is a weighted sum of the inputs. However, we want the function $\phi$ to be
 continuous and differentiable, so a good approximation is the _logistic_ or
 _sigmoid_ function $$\phi(x)=\frac 1{1+\ce^{-x}}$$ which maps $\mathbb{R}$ to
@@ -52,9 +48,7 @@ of the euclidean norm up to a factor $1/2$.
 
 We want to minimize this error, by tweaking the coefficients $w_i$. We thus
 compute
-$$
-\frac{\partial E}{\partial w_i}=\frac{\partial E}{\partial y}\frac{\partial y}{\partial x}\frac{\partial x}{\partial w_i}
-$$
+$$\frac{\partial E}{\partial w_i}=\frac{\partial E}{\partial y}\frac{\partial y}{\partial x}\frac{\partial x}{\partial w_i}$$
 With the usual functions, we have
 
 - $\frac{\partial E}{\partial y}=(y-\overline y)$ (the derivative of the square)
@@ -72,54 +66,38 @@ where $\eta$ is the _learning rate_.
 
 Now suppose that we have $n$ layers of neurons: we write $y^k_j$ for the output
 of the $j$-th neuron at round $k$, which is an input for round $k+1$:
-$$
-y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i)
-$$
+$$y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i)$$
 
 As expected, we write $w^k_{ij}$ for the weight at round $k$ of the $i$-th input
 in the $j$-th output and
-$$
-x^k_j=\sum_iw^k_{ij}y^k_i
-$$
+$$x^k_j=\sum_iw^k_{ij}y^k_i$$
 so that
-$$
-y^{k+1}_j=\phi(x^k_j)
-$$
+$$y^{k+1}_j=\phi(x^k_j)$$
 
 The error we want to minimize is
 $$E=\frac 12\sum_j(y^n_j-\overline y^n_j)^2$$
 and we thus compute
-$$
-\frac{\partial E}{\partial w^k_{ij}}
+$$\frac{\partial E}{\partial w^k_{ij}}
 =\sum_{j'}\frac{\partial E}{\partial x^k_{j'}}\frac{\partial x^k_{j'}}{\partial w^k_{ij}}
 =\frac{\partial E}{\partial x^k_j}y^k_i
-=\delta^k_jy^k_i
-$$
+=\delta^k_jy^k_i$$
 with
-$$
-\delta^k_j=\frac{\partial E}{\partial x^k_j}
-$$
+$$\delta^k_j=\frac{\partial E}{\partial x^k_j}$$
 The first step is
-$$
-\delta^{n-1}_j
+$$\delta^{n-1}_j
 =\frac{\partial E}{\partial x^{n-1}_j}
 =\sum_{j'}\frac{\partial E}{\partial y^n_{j'}}\frac{\partial y^n_{j'}}{\partial x^{n-1}_j}
 =\frac{\partial E}{\partial y^n_j}\frac{\partial y^n_j}{\partial x^{n-1}_j}
-=(y^n_j-\overline y^n_j)\phi'(x^{n-1}_j)
-$$
+=(y^n_j-\overline y^n_j)\phi'(x^{n-1}_j)$$
 And the inductive step is
-$$
-\delta^k_i
+$$\delta^k_i
 =\frac{\partial E}{\partial x^k_i}
 =\sum_{j}\frac{\partial E}{\partial x^{k+1}_j}\frac{\partial x^{k+1}_j}{\partial x^k_{i}}
-=\sum_{j}\delta^{k+1}_jw^k_{ij}\phi'(x^k_i)
-$$
+=\sum_{j}\delta^{k+1}_jw^k_{ij}\phi'(x^k_i)$$
 Namely, $x^{k+1}_j=\sum_i w^k_{ij}\phi(x^k_i)$ implies
-$$
-\frac{\partial x^{k+1}_j}{\partial x^k_i}
+$$\frac{\partial x^{k+1}_j}{\partial x^k_i}
 =
-w^k_{ij}y^k_i(1-y^k_i)
-$$
+w^k_{ij}y^k_i(1-y^k_i)$$
 In the case of the sigmoid function, this can be further simplified by
 $$
 \phi'(x^k_i)=\phi(x^k_i)(1-\phi'(x^k_i))=y^{k+1}_i(1-y^{k+1}_i)
@@ -128,9 +106,7 @@ $$
 Once the $y^k_i$ are computed, we can thus compute the $\delta^k_i$ by
 "propagating backwards", i.e. computing the $\delta^n_i$, the $\delta^{n-1}_i$,
 ..., up to the $\delta^0_i$, and the change in $w^k_{ij}$ should be
-$$
-\Delta w^k_{ij}=-\eta\frac{\partial E}{\partial w^k_{ij}}=-\eta\delta^k_jy^k_i
-$$
+$$\Delta w^k_{ij}=-\eta\frac{\partial E}{\partial w^k_{ij}}=-\eta\delta^k_jy^k_i$$
 
 ## Bias
 
