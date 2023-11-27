@@ -64,9 +64,8 @@ where $\eta$ is the _learning rate_.
 
 ## For a neural network
 
-Now suppose that we have $n$ layers of neurons: we write $y^k_j$ for the output
-of the $j$-th neuron at round $k$, which is an input for round $k+1$:
-$$y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i)$$
+Now suppose that we have $n$ layers of neurons. We write $y^k_j$ for the output
+of the $j$-th neuron at round $k$, which is an input for round $k+1$: $$y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i)$$
 
 As expected, we write $w^k_{ij}$ for the weight at round $k$ of the $i$-th input
 in the $j$-th output and
