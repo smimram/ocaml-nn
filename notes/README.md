@@ -83,7 +83,7 @@ $$\frac{\partial E}{\partial w^k_{ij}}
 with
 $$\delta^k_j=\frac{\partial E}{\partial x^k_j}$$
 The first step is
-$$\delta^{n-1}_j=\frac{\partial E}{\partial x^{n-1}_j}=\sum_{j'}\frac{\partial E}{\partial y^n_{j'}}\frac{\partial y^n_{j'}}{\partial x^{n-1}_j}=\frac{\partial E}{\partial y^n_j}\frac{\partial y^n_j}{\partial x^{n-1}_j}=(y^n_j-\overline y^n_j)\phi'(x^{n-1}_j)$$
+$$\delta^{n-1}_ j=\frac{\partial E}{\partial x^{n-1}_ j}=\sum_{j'}\frac{\partial E}{\partial y^n_ {j'}}\frac{\partial y^n_ {j'}}{\partial x^{n-1}_ j}=\frac{\partial E}{\partial y^n_ j}\frac{\partial y^n_ j}{\partial x^{n-1}_ j}=(y^n_ j-\overline y^n_ j)\phi'(x^{n-1}_ j)$$
 And the inductive step is
 $$\delta^k_i=\frac{\partial E}{\partial x^k_i}=\sum_{j}\frac{\partial E}{\partial x^{k+1}_j}\frac{\partial x^{k+1}_j}{\partial x^k_{i}}=\sum_{j}\delta^{k+1}_jw^k_{ij}\phi'(x^k_i)$$
 Namely, $x^{k+1}_j=\sum_i w^k_{ij}\phi(x^k_i)$ implies
