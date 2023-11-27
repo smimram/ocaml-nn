@@ -87,7 +87,7 @@ $$\delta^{n-1}_ j=\frac{\partial E}{\partial x^{n-1}_ j}=\sum_{j'}\frac{\partial
 And the inductive step is
 $$\delta^k_ i=\frac{\partial E}{\partial x^k_ i}=\sum_{j}\frac{\partial E}{\partial x^{k+1}_ j}\frac{\partial x^{k+1}_ j}{\partial x^k_ i}=\sum_ j\delta^{k+1}_ jw^k_ {ij}\phi'(x^k_ i)$$
 Namely, $x^{k+1}_ j=\sum_i w^k_ {ij}\phi(x^k_ i)$ implies
-$$\frac{\partial x^{k+1}_j}{\partial x^k_i}=w^k_{ij}y^k_i(1-y^k_i)$$
+$$\frac{\partial x^{k+1}_ j}{\partial x^k_ i}=w^k_ {ij}y^k_i(1-y^k_ i)$$
 In the case of the sigmoid function, this can be further simplified by
 $$\phi'(x^k_i)=\phi(x^k_i)(1-\phi'(x^k_i))=y^{k+1}_i(1-y^{k+1}_i)$$
 
