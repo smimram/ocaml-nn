@@ -29,9 +29,11 @@ parameters are
 ## For one neuron
 
 A _neuron_ gives an output $y$ depending on a bunch of inputs $x_i$. The formula
-is $$y=\phi(\sum_i w_ix_i)=\phi(x)$$ where $\phi$ is an _activation function_
-which basically returns $0$ or $1$ depending on whether its input is below or
-above $0.5$ (some people also add an offset called _bias_ to the sum, see below)
+is 
+$$
+y=\phi(\sum_i w_ix_i)=\phi(x)
+$$
+where $\phi$ is an _activation function_ which basically returns $0$ or $1$ depending on whether its input is below or above $0.5$ (some people also add an offset called _bias_ to the sum, see below)
 and
 $$
 x=\sum_iw_ix_i
@@ -74,7 +76,9 @@ where $\eta$ is the _learning rate_.
 
 Now suppose that we have $n$ layers of neurons: we write $y^k_j$ for the output
 of the $j$-th neuron at round $k$, which is an input for round $k+1$:
-$$y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i)$$
+$$
+y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i)
+$$
 
 As expected, we write $w^k_{ij}$ for the weight at round $k$ of the $i$-th input
 in the $j$-th output and
