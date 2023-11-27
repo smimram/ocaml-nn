@@ -92,8 +92,7 @@ In the case of the sigmoid function, this can be further simplified by
 $$\phi'(x^k_i)=\phi(x^k_i)(1-\phi'(x^k_i))=y^{k+1}_i(1-y^{k+1}_i)$$
 
 Once the $y^k_i$ are computed, we can thus compute the $\delta^k_i$ by
-"propagating backwards", i.e. computing the $\delta^n_i$, the $\delta^{n-1}_i$,
-..., up to the $\delta^0_i$, and the change in $w^k_ {ij}$ should be
+"propagating backwards", i.e. computing the $\delta^n_ i$, the $\delta^{n-1}_ i$, ..., up to the $\delta^0_ i$, and the change in $w^k_ {ij}$ should be
 $$\Delta w^k_ {ij}=-\eta\frac{\partial E}{\partial w^k_ {ij}}=-\eta\delta^k_jy^k_i$$
 
 ## Bias
