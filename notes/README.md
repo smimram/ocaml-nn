@@ -12,9 +12,7 @@ header-includes:
 In Q-learning, we have a function $Q(s,a)$ which depends on the current state
 $s$ and the action $a$ to perform and returns a real. We update it when we play
 an action $a$ in a state $s$ with
-$$
-Q_{n+1}(s,a) = Q_n(s,a)+\alpha(r+\gamma\times\max_b Q_n(s\cdot a,b)-Q_n(s,a))
-$$
+$$Q_{n+1}(s,a) = Q_n(s,a)+\alpha(r+\gamma\times\max_b Q_n(s\cdot a,b)-Q_n(s,a))$$
 where $s\cdot a$ is the state reached after performing the action $a$ and the
 parameters are
 
@@ -67,9 +65,7 @@ so that $$\frac{\partial E}{\partial w_i}=(y-\overline y)y(1-y)x_i$$
 
 In order to minimize the error, we use a gradient descent and add, to each $w_i$
 the quantity
-$$
-\Delta w_i=-\eta\frac{\partial E}{\partial w_i}=-\eta (y-\overline y)y(1-y)x_i
-$$
+$$\Delta w_i=-\eta\frac{\partial E}{\partial w_i}=-\eta (y-\overline y)y(1-y)x_i$$
 where $\eta$ is the _learning rate_.
 
 ## For a neural network
