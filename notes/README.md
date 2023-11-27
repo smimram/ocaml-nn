@@ -90,8 +90,9 @@ $$
 y^{k+1}_j=\phi(x^k_j)
 $$
 
-The error we want to minimize is $$E=\frac 12\sum_j(y^n_j-\overline y^n_j)^2$$ and we
-thus compute
+The error we want to minimize is
+$$E=\frac 12\sum_j(y^n_j-\overline y^n_j)^2$$
+and we thus compute
 $$
 \frac{\partial E}{\partial w^k_{ij}}
 =\sum_{j'}\frac{\partial E}{\partial x^k_{j'}}\frac{\partial x^k_{j'}}{\partial w^k_{ij}}
