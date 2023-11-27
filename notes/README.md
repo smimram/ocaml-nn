@@ -89,9 +89,7 @@ $$\delta^k_i=\frac{\partial E}{\partial x^k_i}=\sum_{j}\frac{\partial E}{\partia
 Namely, $x^{k+1}_j=\sum_i w^k_{ij}\phi(x^k_i)$ implies
 $$\frac{\partial x^{k+1}_j}{\partial x^k_i}=w^k_{ij}y^k_i(1-y^k_i)$$
 In the case of the sigmoid function, this can be further simplified by
-$$
-\phi'(x^k_i)=\phi(x^k_i)(1-\phi'(x^k_i))=y^{k+1}_i(1-y^{k+1}_i)
-$$
+$$\phi'(x^k_i)=\phi(x^k_i)(1-\phi'(x^k_i))=y^{k+1}_i(1-y^{k+1}_i)$$
 
 Once the $y^k_i$ are computed, we can thus compute the $\delta^k_i$ by
 "propagating backwards", i.e. computing the $\delta^n_i$, the $\delta^{n-1}_i$,
@@ -101,14 +99,8 @@ $$\Delta w^k_{ij}=-\eta\frac{\partial E}{\partial w^k_{ij}}=-\eta\delta^k_jy^k_i
 ## Bias
 
 If we consider neural networks with bias
-$$
-y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i+b^k_j)
-$$
+$$y^{k+1}_j=\phi(\sum_i w^k_{ij}y^k_i+b^k_j)$$
 we need to optimize those. This can be achieved in the same way, computing that
-$$
-\frac{\partial E}{\partial b^k_i}=\delta^k_i
-$$
+$$\frac{\partial E}{\partial b^k_i}=\delta^k_i$$
 and thus
-$$
-\Delta b^k_i=-\eta\delta^k_i
-$$
+$$\Delta b^k_i=-\eta\delta^k_i$$
