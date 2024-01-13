@@ -34,7 +34,7 @@ and
 $$x=\sum_iw_ix_i$$
 is a weighted sum of the inputs. However, we want the function $\phi$ to be
 continuous and differentiable, so a good approximation is the _logistic_ or
-_sigmoid_ function $$\phi(x)=\frac 1{1+\ce^{-x}}$$ which maps $\mathbb{R}$ to
+_sigmoid_ function $$\phi(x)=\frac 1{1+\exp(-x)}$$ which maps $\mathbb{R}$ to
 $[0,1]$ and satisfies $$\phi'(x)=\phi(x)(1-\phi(x))$$ We can add a coefficient
 to the exponential, i.e. take $\phi(kx)$, to make the step sharper or smoother,
 and other choices are popular such as $$\psi(x)=\tanh(x)$$ whose derivative is
