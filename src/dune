@@ -1,3 +1,4 @@
 (executable
+ (libraries graphics)
  (name test)
 )

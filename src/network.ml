@@ -17,7 +17,7 @@ let ( #. ) = M.cmul
 let ( #+ ) = M.add
 let ( #- ) = M.sub
 
-(** A network is a list of layers encoded as wji being the weight from the
+(** A network is a list of layers encoded as w.(j).(i) being the weight from the
     input i to the output j. *)
 type t = Matrix.t list
 
@@ -79,6 +79,8 @@ let error nn data =
   |> List.fold_left (+.) 0.
   |> (fun x -> x /. float (List.length data))
 
+(** Iterate backpropagation until given number of loops or precision have been
+    reached. *)
 let fit ?(layers=[]) ?(iterations=10_000) ?(precision=1e-3) ?(rate=0.2) data =
   let i, o =
     let x, y = List.hd data in
@@ -96,6 +98,7 @@ let fit ?(layers=[]) ?(iterations=10_000) ?(precision=1e-3) ?(rate=0.2) data =
   in
   loop 0 nn
 
+(** Predict the output on a given input. *)
 let predict nn x =
   x
   |> M.of_list
