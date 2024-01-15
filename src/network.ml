@@ -1,14 +1,4 @@
-(** The sigmoid activation function. *)
-let sigmoid x = 1. /. (1. +. (exp (-.x)))
-
-module List = struct
-  include List
-
-  let rec last = function
-    | [] -> assert false
-    | [x] -> x
-    | _::l -> last l
-end
+open Extlib
 
 module M = Matrix
 let ( #@ ) = M.mul
