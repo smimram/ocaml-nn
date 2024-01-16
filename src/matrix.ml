@@ -82,3 +82,6 @@ let mul (a:t) (b:t) =
   let n = cols a in
   init (rows a) (cols b) (fun i k -> Int.fold (fun x j -> x +. a.(i).(j) *. b.(j).(k)) 0. n)
 
+let app (f:t) (x:Vector.t) =
+  assert (src f = Vector.dim x);
+  Vector.init (tgt f) (fun i -> Int.fold (fun s j -> s +. f.(i).(j) *. x.(j)) 0. (src f))

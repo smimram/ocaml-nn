@@ -1,5 +1,7 @@
 open Extlib
 
+let () = ignore Net.affine
+
 (* Basic tests. *)
 let () =
   Printf.printf "Basic tests...\n%!";
