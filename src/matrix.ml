@@ -25,8 +25,10 @@ let cols (a:t) = Array.length a.(0)
 
 let dims a = rows a, cols a
 
+(** Dimension of the source. *)
 let src = cols
 
+(** Dimension of the target. *)
 let tgt = rows
 
 let print_dims s a =
