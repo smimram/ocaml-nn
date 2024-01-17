@@ -14,6 +14,7 @@ end
     corresponds to the i-th output of the j-th input. *)
 type t = float array array
 
+(** Create a matrix. *)
 let init rows cols f : t =
   Array.init rows (fun i -> Array.init cols (fun j -> f i j))
 

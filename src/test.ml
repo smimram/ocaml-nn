@@ -1,6 +1,27 @@
 open Extlib
 
-let () = ignore Net.affine
+let () = Random.self_init ()
+
+(* Let's try to learn f(x) = x^2 *)
+let () =
+  (* Dataset. *)
+  let dataset = List.map (fun x -> Vector.scalar x, Vector.scalar (x*.x)) [-1.0; -0.8; -0.6; -0.4; -0.2; 0.0; 0.2; 0.4; 0.6; 0.8; 1.0] in
+
+  (* Train a network with one hidden layer of size 6. *)
+  let net = Net.neural ~rate:0.2 [1;6;1] in
+  for _ = 0 to 1000 do
+    Net.fit net dataset
+  done;
+
+  (* Profit *)
+  let xs = [-1.0; 0.6; -0.4; 0.0; 0.1; 0.9; -0.5] in
+  List.iter
+    (fun x ->
+       Printf.printf "f(%f) = %f\n" x (Net.predict net (Vector.scalar x) |> Vector.to_scalar)
+    ) xs
+
+(*
+let () = ignore Net.backward
 
 (* Basic tests. *)
 let () =
@@ -50,3 +71,4 @@ let () =
        Graphics.lineto i j)
     tests;
   Graphics.loop_at_exit [Graphics.Key_pressed; Graphics.Button_down] (fun _ -> raise Exit);
+*)
