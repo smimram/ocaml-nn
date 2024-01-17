@@ -60,16 +60,17 @@ module Layer = struct
       assert (Vector.dim x = inputs);
       Vector.add (Matrix.app w x) b
     in
+    let wt = Matrix.transpose w in
     let backward x g =
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
       for j = 0 to Matrix.tgt w - 1 do
-        b.(j) <- b.(j) -. rate *. g.(j);
+        (* b.(j) <- b.(j) -. rate *. g.(j); *)
         for i = 0 to Matrix.src w - 1 do
           w.(j).(i) <- w.(j).(i) -. rate *. g.(j) *. x.(i)
         done
       done;
-      Matrix.app (Matrix.transpose w) g
+      Matrix.app wt g
     in
     { inputs; outputs; forward; backward }
     
@@ -130,7 +131,8 @@ let make (net : Layer.t list) : t =
   check n net;
   net
 
-(** Create a neural network with given arities for the layers and convergence rate.. *)
+(** Create a neural network with given arities for the layers and convergence
+    rate. *)
 let neural ?(activation=`Sigmoid) ~rate layers =
   assert (layers <> []);
   let n = List.hd layers in
