@@ -1,7 +1,8 @@
 # ocaml-nn
 
-A library for manipulating neural networks in OCaml. This is my own take at
-learning neural networks.
+A library for manipulating neural networks in OCaml: this is my own take at
+learning neural networks. You can have a look at [the documentation for the
+library](http://smimram.github.io/ocaml-nn/).
 
 ## See also
 
