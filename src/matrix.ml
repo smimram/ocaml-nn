@@ -70,7 +70,7 @@ let map2 f (a:t) (b:t) : t =
   assert (cols a = cols b);
   Array.map2 (Array.map2 f) a b
 
-let add a b = map2 (+.) a b
+let add (a:t) (b:t) = map2 (+.) a b
 
 let cmul x a = map (fun y -> x *. y) a
 

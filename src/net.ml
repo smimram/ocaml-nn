@@ -2,7 +2,6 @@
 
 open Extlib
 
-(*
 (** Batch references. *)
 module Batch = struct
   type 'a t =
@@ -25,21 +24,21 @@ module Batch = struct
 
   let float =
     let fold batch =
-      let s, n = List.fold_left (fun (s,n) x -> s+.x, n+1) (List.hd batch, 0) (List.tl batch) in
+      let s, n = List.fold_left (fun (s,n) x -> s+.x, n+1) (List.hd batch, 1) (List.tl batch) in
       s /. float_of_int n
     in
     make fold
 
   let vector =
     let fold batch =
-      let s, n = List.fold_left (fun (s,n) x -> Vector.add s x, n+1) (List.hd batch, 0) (List.tl batch) in
+      let s, n = List.fold_left (fun (s,n) x -> Vector.add s x, n+1) (List.hd batch, 1) (List.tl batch) in
       Vector.cmul (1. /. float_of_int n) s
     in
     make fold
 
   let matrix =
     let fold batch =
-      let s, n = List.fold_left (fun (s,n) x -> Matrix.add s x, n+1) (List.hd batch, 0) (List.tl batch) in
+      let s, n = List.fold_left (fun (s,n) x -> Matrix.add s x, n+1) (List.hd batch, 1) (List.tl batch) in
       Matrix.cmul (1. /. float_of_int n) s
     in
     make fold
@@ -63,14 +62,15 @@ module Batch = struct
     let (:=) = set
   end
 end
-*)
 
+(*
 module Batch = struct
   let vector _ = ref
   let matrix _ = ref
   let get = (!)
   let set x v = x := v
 end
+   *)
 
 (** Layers of a net. *)
 module Layer = struct
@@ -92,7 +92,7 @@ module Layer = struct
   let tgt l = l.outputs
 
   (** Each output is an affine combination of all the inputs. *)
-  let affine ?(batch=1) ~rate w b =
+  let affine ?(batch=100) ~rate w b =
     assert (Matrix.tgt w = Vector.dim b);
     let inputs = Matrix.src w in
     let outputs = Matrix.tgt w in
