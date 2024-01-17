@@ -22,6 +22,12 @@
  (libraries nn)
 )
 
+(executable
+ (name makemore)
+ (modules makemore)
+ (libraries nn)
+)
+
 (rule
  (alias runtest)
  (action
