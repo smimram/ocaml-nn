@@ -2,6 +2,9 @@ all:
 	@dune exec ./test.exe
 	@dune exec ./char_rnn.exe
 
+square:
+	@dune exec ./square.exe
+
 shakespeare:
 	wget https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt -O shakespeare.txt
 

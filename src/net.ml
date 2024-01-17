@@ -92,7 +92,7 @@ module Layer = struct
   let tgt l = l.outputs
 
   (** Each output is an affine combination of all the inputs. *)
-  let affine ?(batch=100) ~rate w b =
+  let affine ?(batch=100) ?(regularization=0.) ~rate w b =
     assert (Matrix.tgt w = Vector.dim b);
     let inputs = Matrix.src w in
     let outputs = Matrix.tgt w in
@@ -107,8 +107,8 @@ module Layer = struct
     let backward x g =
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
-      let b' = Array.mapi (fun j b -> b -. rate *. g.(j)) (Batch.get b) in
-      let w' = Matrix.mapi (fun j i w -> w -. rate *. g.(j) *. x.(i)) (Batch.get w) in
+      let b' = Array.mapi (fun j b -> b -. rate *. (g.(j) +. regularization *. b)) (Batch.get b) in
+      let w' = Matrix.mapi (fun j i w -> w -. rate *. (g.(j) *. x.(i) +. regularization *. w)) (Batch.get w) in
       let g' = Matrix.tapp (Batch.get w) g in
       Batch.set w w';
       Batch.set b b';
@@ -120,7 +120,7 @@ module Layer = struct
   let activation kind n =
     let f, f' =
       match kind with
-      | `Sigmoid -> (sigmoid, fun x -> sigmoid x *. (1. -. sigmoid x))
+      | `Sigmoid -> (sigmoid, fun x -> let s = sigmoid x in s *. (1. -. s))
       | `ReLU -> (relu, step)
     in
     let forward x = Vector.map f x in
@@ -152,6 +152,25 @@ module Layer = struct
       forward = forward;
       backward = backward   
     }
+
+  (** Apply the softmax function (to turn logits into probabilities). *)
+  let softmax n =
+    let forward x = Vector.softmax x in
+    let backward x g =
+      let s = forward x in
+      (* TODO: check this *)
+      Vector.init n
+        (fun j ->
+           let sj = s.(j) in
+           Vector.mapi (fun i si -> g.(i) *. si *. (if i = j then (1. -. sj) else sj)) s |> Vector.sum
+        )
+    in
+    {
+      inputs = n;
+      outputs = n;
+      forward;
+      backward
+    }
 end
 
 open Layer
@@ -182,7 +201,7 @@ let append net1 net2 =
 
 (** Create a neural network with given arities for the layers and convergence
     rate. *)
-let neural ?(activation=`Sigmoid) ~rate layers =
+let neural ?(activation=`Sigmoid) ?batch ~rate layers =
   assert (layers <> []);
   let n = List.hd layers in
   let layers = List.tl layers in
@@ -190,7 +209,7 @@ let neural ?(activation=`Sigmoid) ~rate layers =
     | l::layers ->
       let w = Matrix.init l n (fun _ _ -> Random.float 2. -. 1.) in
       let b = Vector.init l (fun _ -> 0.) in
-      [Layer.affine ~rate w b; Layer.activation activation l]@(aux l layers)
+      [Layer.affine ?batch ~rate w b; Layer.activation activation l]@(aux l layers)
     | [] -> []
   in
   make (aux n layers)
