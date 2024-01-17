@@ -1,67 +1,7 @@
 (** Generic networks. *)
 
 open Extlib
-
-(** Batch references. *)
-module Batch = struct
-  type 'a t =
-    {
-      every : int;
-      mutable contents : 'a; (** Current contents. *)
-      mutable batch : 'a list; (** Future contents. *)
-      mutable batch_length : int;
-      fold : 'a list -> 'a; (** Function to collect the values. *)
-    }
-
-  let make fold every x =
-    {
-      every;
-      contents = x;
-      batch = [];
-      batch_length = 0;
-      fold
-    }
-
-  let float =
-    let fold batch =
-      let s, n = List.fold_left (fun (s,n) x -> s+.x, n+1) (List.hd batch, 1) (List.tl batch) in
-      s /. float_of_int n
-    in
-    make fold
-
-  let vector =
-    let fold batch =
-      let s, n = List.fold_left (fun (s,n) x -> Vector.add s x, n+1) (List.hd batch, 1) (List.tl batch) in
-      Vector.cmul (1. /. float_of_int n) s
-    in
-    make fold
-
-  let matrix =
-    let fold batch =
-      let s, n = List.fold_left (fun (s,n) x -> Matrix.add s x, n+1) (List.hd batch, 1) (List.tl batch) in
-      Matrix.cmul (1. /. float_of_int n) s
-    in
-    make fold
-
-  let get r = r.contents
-
-  let collect r =
-    r.contents <- r.fold r.batch;
-    r.batch <- [];
-    r.batch_length <- 0
-  
-  let set r x =
-    r.batch <- x::r.batch;
-    r.batch_length <- r.batch_length + 1;
-    if r.batch_length >= r.every then collect r
-
-  module Operations = struct
-    let ref x = make x
-    let (!) = get
-    let (:=) = set
-  end
-end
-
+   
 (** Layers of a net. *)
 module Layer = struct
   (** A layer. *)
@@ -82,26 +22,24 @@ module Layer = struct
   let tgt l = l.outputs
 
   (** Each output is an affine combination of all the inputs. *)
-  let affine ?(batch=100) ?(regularization=0.) ~rate w b =
+  let affine ?(regularization=0.) ~rate w b =
     assert (Matrix.tgt w = Vector.dim b);
     let inputs = Matrix.src w in
     let outputs = Matrix.tgt w in
-    let w = Batch.matrix batch w in
-    let b = Batch.vector batch b in
+    let w = ref w in
+    let b = ref b in
     let forward x =
       assert (Vector.dim x = inputs);
-      let w = Batch.get w in
-      let b = Batch.get b in
-      Vector.add (Matrix.app w x) b
+      Vector.add (Matrix.app !w x) !b
     in
     let backward x g =
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
-      let b' = Array.mapi (fun j b -> b -. rate *. (g.(j) +. regularization *. b)) (Batch.get b) in
-      let w' = Matrix.mapi (fun j i w -> w -. rate *. (g.(j) *. x.(i) +. regularization *. w)) (Batch.get w) in
-      let g' = Matrix.tapp (Batch.get w) g in
-      Batch.set w w';
-      Batch.set b b';
+      let g' = Matrix.tapp !w g in
+      let b' = Array.mapi (fun j b -> b -. rate *. (g.(j) +. regularization *. b)) !b in
+      let w' = Matrix.mapi (fun j i w -> w -. rate *. (g.(j) *. x.(i) +. regularization *. w)) !w in
+      w := w';
+      b := b';
       g'
     in
     { inputs; outputs; forward; backward }
@@ -212,7 +150,7 @@ let append net1 net2 =
 
 (** Create a neural network with given arities for the layers and convergence
     rate. *)
-let neural ?(activation=`Sigmoid) ?batch ~rate layers =
+let neural ?(activation=`Sigmoid) ~rate layers =
   assert (layers <> []);
   let n = List.hd layers in
   let layers = List.tl layers in
@@ -220,7 +158,7 @@ let neural ?(activation=`Sigmoid) ?batch ~rate layers =
     | l::layers ->
       let w = Matrix.init l n (fun _ _ -> Random.float 2. -. 1.) in
       let b = Vector.init l (fun _ -> 0.) in
-      [Layer.affine ?batch ~rate w b; Layer.activation activation l]@(aux l layers)
+      [Layer.affine ~rate w b; Layer.activation activation l]@(aux l layers)
     | [] -> []
   in
   make (aux n layers)

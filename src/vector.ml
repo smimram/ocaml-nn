@@ -39,6 +39,8 @@ let hadamard x y = map2 ( *. ) x y
 
 let init n f : t = Array.init n f
 
+let copy (x:t) : t = Array.copy x
+
 (** Maximum entry of a vector. *)
 let max (x:t) =
   Array.fold_left max (-. infinity) x

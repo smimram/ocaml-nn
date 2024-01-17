@@ -24,6 +24,8 @@ let rows (a:t) = Array.length a
 (** Number of columns. *)
 let cols (a:t) = Array.length a.(0)
 
+let copy (a:t) : t = Array.init (rows a) (fun j -> Array.copy a.(j))
+
 let dims a = rows a, cols a
 
 (** Dimension of the source. *)
