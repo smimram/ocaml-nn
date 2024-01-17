@@ -17,8 +17,40 @@ type layer = {
 
 type t = layer list
 
+(** Create a network from a list of layers. *)
+let make (net : layer list) : t =
+  assert (net <> []);
+  let n = (List.hd net).inputs in
+  let rec check n = function
+    | layer::net -> assert (layer.inputs = n); check layer.outputs net
+    | [] -> if n <> 1 then failwith "Expecting one output: did you forget to put an error measurement in the end?"
+  in
+  check n net;
+  net
+
+(** Forward propagation: returns the output, as well as layers decorated with
+    their input. *)
+let forward (net:t) x =
+  let rec aux x = function
+    | [l] -> l.forward x, [x,l]
+    | l::net ->
+      let o, net = aux (l.forward x) net in
+      o, (x,l)::net
+    | [] -> assert false
+  in
+  aux x net
+
+(** Backward propagation. *)
+let backward (net:t) x =
+  let _, net = forward net x in
+  let rec aux g = function
+    | (x,l)::net -> aux (l.backward x g) net
+    | [] -> g
+  in
+  ignore (aux [|1.|] net)
+  
 (** Apply an activation function on each input. *)
-let activation kind n : layer =
+let activation kind n =
   let f, f' =
     match kind with
     | `Sigmoid -> (sigmoid, fun x -> sigmoid x *. (1. -. sigmoid x))
@@ -59,7 +91,6 @@ let square_distance target =
     inputs = n;
     outputs = 1;
     forward = Vector.hadamard target;
-    backward = backward
-      
+    backward = backward   
   }
-  
+
