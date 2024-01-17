@@ -4,17 +4,26 @@ open Extlib
 
 (** Batch references. *)
 module Batch = struct
-  type t =
+  type 'a t =
     {
-      mutable contents : float;
-      mutable batch : float list;
+      mutable contents : 'a; (** Current contents. *)
+      mutable batch : 'a list; (** Future contents. *)
+      fold : 'a list -> 'a; (** Function to collect the values. *)
     }
 
-  let make x =
+  let make fold x =
     {
       contents = x;
-      batch = []
+      batch = [];
+      fold
     }
+
+  let make_float =
+    let fold batch =
+      let s, n = List.fold_left (fun (s,n) x -> s+.x, n+1) (0.,0) batch in
+      s /. float n
+    in
+    make fold
 
   let get r = r.contents
 
@@ -27,8 +36,7 @@ module Batch = struct
   end
 
   let collect r =
-    let s, n = List.fold_left (fun (s,n) x -> s+.x, n+1) (0.,0) r.batch in
-    r.contents <- s /. float n;
+    r.contents <- r.fold r.batch;
     r.batch <- []
 end
 
@@ -65,7 +73,7 @@ module Layer = struct
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
       for j = 0 to Matrix.tgt w - 1 do
-        (* b.(j) <- b.(j) -. rate *. g.(j); *)
+        b.(j) <- b.(j) -. rate *. g.(j);
         for i = 0 to Matrix.src w - 1 do
           w.(j).(i) <- w.(j).(i) -. rate *. g.(j) *. x.(i)
         done
@@ -114,22 +122,29 @@ end
 
 open Layer
 
-type t = Layer.t list
+type t =
+  {
+    layers : Layer.t list
+  }
 
-let src (net:t) = (List.hd net).inputs
+let src (net:t) = (List.hd net.layers).inputs
 
-let tgt (net:t) = (List.last net).outputs
+let tgt (net:t) = (List.last net.layers).outputs
 
 (** Create a network from a list of layers. *)
-let make (net : Layer.t list) : t =
-  assert (net <> []);
-  let n = (List.hd net).inputs in
+let make layers : t =
+  assert (layers <> []);
+  let n = (List.hd layers).inputs in
   let rec check n = function
     | layer::net -> assert (layer.inputs = n); check layer.outputs net
     | [] -> if n <> 1 then failwith "Expecting one output: did you forget to put an error measurement in the end?"
   in
-  check n net;
-  net
+  check n layers;
+  { layers }
+
+let append net1 net2 =
+  assert (tgt net1 = src net2);
+  { layers = net1.layers@net2.layers }
 
 (** Create a neural network with given arities for the layers and convergence
     rate. *)
@@ -144,34 +159,36 @@ let neural ?(activation=`Sigmoid) ~rate layers =
       [Layer.affine ~rate w b; Layer.activation activation l]@(aux l layers)
     | [] -> []
   in
-  aux n layers
+  make (aux n layers)
 
 (** Compute the output of a network on a given input. *)
-let rec predict (net:t) x =
-  match net with
-  | l::net -> predict net (l.forward x)
+let predict net x =
+  let rec aux x = function
+  | l::layers -> aux (l.forward x) layers
   | [] -> x
+  in
+  aux x net.layers
 
 (** Forward propagation: returns layers decorated with their input, as well as
     the global output. *)
-let forward (net:t) x =
+let forward net x =
   let rec aux x = function
     | [l] -> [x,l], l.forward x
-    | l::net ->
-      let net, o = aux (l.forward x) net in
-      (x,l)::net, o
+    | l::layers ->
+      let layers, o = aux (l.forward x) layers in
+      (x,l)::layers, o
     | [] -> assert false
   in
-  aux x net
+  aux x net.layers
 
 (** Backward propagation. Returns the previously computed error. *)
-let backward (net:t) x =
-  let net, o = forward net x in
+let backward net x =
+  let layers, o = forward net x in
   let rec aux = function
     | (x,l)::net -> l.backward x (aux net)
     | [] -> Vector.scalar 1.
   in
-  ignore (aux net);
+  ignore (aux layers);
   Vector.to_scalar o
 
 (** Train a network on given data. *)
@@ -182,7 +199,8 @@ let fit ?(distance=`Euclidean) ?(precision=1e-3) net dataset =
     | `Euclidean -> Layer.squared_distance target
   in
   let step x y =
-    let net = net@[distance y] in
+    let distance = make [distance y] in
+    let net = append net distance in
     (* List.iter (fun l -> Printf.printf "%d -> %d\n%!" (Layer.src l) (Layer.tgt l)) net; *)
     let o = backward net x in
     if o < precision then raise Exit
