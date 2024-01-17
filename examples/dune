@@ -11,6 +11,12 @@
 )
 
 (executable
+ (name ngram)
+ (modules ngram)
+ (libraries nn)
+)
+
+(executable
  (name char_rnn)
  (modules char_rnn)
  (libraries nn)
