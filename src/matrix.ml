@@ -14,6 +14,7 @@ end
     corresponds to the i-th output of the j-th input. *)
 type t = float array array
 
+(** Create a matrix. *)
 let init rows cols f : t =
   Array.init rows (fun i -> Array.init cols (fun j -> f i j))
 
@@ -25,8 +26,10 @@ let cols (a:t) = Array.length a.(0)
 
 let dims a = rows a, cols a
 
+(** Dimension of the source. *)
 let src = cols
 
+(** Dimension of the target. *)
 let tgt = rows
 
 let print_dims s a =
@@ -80,3 +83,6 @@ let mul (a:t) (b:t) =
   let n = cols a in
   init (rows a) (cols b) (fun i k -> Int.fold (fun x j -> x +. a.(i).(j) *. b.(j).(k)) 0. n)
 
+let app (f:t) (x:Vector.t) =
+  assert (src f = Vector.dim x);
+  Vector.init (tgt f) (fun i -> Int.fold (fun s j -> s +. f.(i).(j) *. x.(j)) 0. (src f))
