@@ -45,7 +45,6 @@ module Batch = struct
 
   let get r = r.contents
 
-
   let collect r =
     r.contents <- r.fold r.batch;
     r.batch <- [];
@@ -62,15 +61,6 @@ module Batch = struct
     let (:=) = set
   end
 end
-
-(*
-module Batch = struct
-  let vector _ = ref
-  let matrix _ = ref
-  let get = (!)
-  let set x v = x := v
-end
-   *)
 
 (** Layers of a net. *)
 module Layer = struct
@@ -215,6 +205,7 @@ let make layers : t =
   check n layers;
   { layers }
 
+(** Append two networks. *)
 let append net1 net2 =
   assert (tgt net1 = src net2);
   { layers = net1.layers@net2.layers }
