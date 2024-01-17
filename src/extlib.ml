@@ -10,6 +10,12 @@ let step x = if x <= 0. then 0. else 1.
 module List = struct
   include List
 
+  let rec map3 f l1 l2 l3 =
+    match l1, l2, l3 with
+    | x::l1, y::l2, z::l3 -> (f x y z)::(map3 f l1 l2 l3)
+    | [], [], [] -> []
+    | _ -> assert false
+
   let rec last = function
     | [] -> assert false
     | [x] -> x

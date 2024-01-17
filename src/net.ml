@@ -132,6 +132,27 @@ module Layer = struct
       forward;
       backward;
     }
+
+  (** Tensor product of lines. *)
+  let tensor l =
+    let srcs = List.map src l in
+    let tgts = List.map tgt l in
+    let inputs = List.fold_left (+) 0 srcs in
+    let outputs = List.fold_left (+) 0 tgts in
+    let _, ioff = List.fold_left_map (fun o n -> o+n, o) 0 srcs in
+    let _, ooff = List.fold_left_map (fun o n -> o+n, o) 0 tgts in
+    let forward x =
+      let xs = List.map2 (fun o l -> Array.sub x o l) ioff srcs in
+      let ys = List.map2 (fun l x -> l.forward x) l xs in
+      Array.concat ys
+    in
+    let backward x g =
+      let xs = List.map2 (fun o l -> Array.sub x o l) ioff srcs in
+      let gs = List.map2 (fun o l -> Array.sub g o l) ooff tgts in
+      let gs' = List.map3 (fun l x g -> l.backward x g) l xs gs in
+      Array.concat gs'
+    in
+    { inputs; outputs; forward; backward }
 end
 
 open Layer
