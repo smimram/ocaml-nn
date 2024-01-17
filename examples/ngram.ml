@@ -45,7 +45,7 @@ let () =
   *)
 
   (* Compute n-grams. *)
-  let order = 6 in
+  let order = 12 in
   let file = String.make order '~' ^ file in
   let ngram = ref StringMap.empty in
   for i = 0 to String.length file - order - 2 do

@@ -139,9 +139,9 @@ module Layer = struct
   (** Half of the square of the euclidean distance to a given target. *)
   let squared_distance target =
     let n = Vector.dim target in
-    let forward x = 0.5 *. Vector.squared_norm (Vector.diff x target) |> Vector.scalar in
+    let forward x = 0.5 *. Vector.squared_norm (Vector.sub x target) |> Vector.scalar in
     let backward x g =
-      let x = Vector.diff x target in
+      let x = Vector.sub x target in
       let g = g.(0) in
       (* We usually start backpropagating from 1. *)
       if g = 1. then x else Vector.cmul g x
@@ -156,20 +156,40 @@ module Layer = struct
   (** Apply the softmax function (to turn logits into probabilities). *)
   let softmax n =
     let forward x = Vector.softmax x in
-    let backward x g =
-      let s = forward x in
+    let backward _x _g =
+      (* let s = forward x in *)
       (* TODO: check this *)
+      failwith "TODO: check implementation.";
+      (*
       Vector.init n
         (fun j ->
            let sj = s.(j) in
            Vector.mapi (fun i si -> g.(i) *. si *. (if i = j then (1. -. sj) else sj)) s |> Vector.sum
         )
+         *)
     in
     {
       inputs = n;
       outputs = n;
       forward;
       backward
+    }
+
+  (** Softmax followed by cross-entropy. *)
+  let softmax_ce n target =
+    let forward x =
+      let s = x |> Vector.map exp |> Vector.sum |> log in
+      Vector.map (fun x -> s -. x) x
+    in
+    let backward x g =
+      assert (g = Vector.scalar 1.);
+      Vector.sub (Vector.softmax x) (Vector.init n (fun i -> if i = target then 1. else 0.))
+    in
+    {
+      inputs = n;
+      outputs = 1;
+      forward;
+      backward;
     }
 end
 

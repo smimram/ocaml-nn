@@ -26,7 +26,7 @@ let map2 f (x:t) (y:t) : t = Array.map2 f x y
 
 let add (x:t) (y:t) : t = Array.map2 (+.) x y
 
-let diff (x:t) (y:t) : t = Array.map2 (-.) x y
+let sub (x:t) (y:t) : t = Array.map2 (-.) x y
 
 (** Sum of the entries of the vector. *)
 let sum (x:t) = Array.fold_left (+.) 0. x
