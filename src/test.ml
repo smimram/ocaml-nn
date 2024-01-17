@@ -9,15 +9,15 @@ let () =
 
   (* Train a network with one hidden layer of size 6. *)
   let net = Net.neural ~rate:0.2 [1;6;1] in
-  for _ = 0 to 1000 do
+  for _ = 0 to 100_000 do
     Net.fit net dataset
   done;
 
   (* Profit *)
-  let xs = [-1.0; 0.6; -0.4; 0.0; 0.1; 0.9; -0.5] in
+  let xs = [-1.0; -0.5; -0.4; 0.0; 0.1; 0.6; 0.9] in
   List.iter
     (fun x ->
-       Printf.printf "f(%f) = %f\n" x (Net.predict net (Vector.scalar x) |> Vector.to_scalar)
+       Printf.printf "f(%f) = %f instead of %f\n" x (Net.predict net (Vector.scalar x) |> Vector.to_scalar) (x *. x)
     ) xs
 
 (*

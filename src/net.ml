@@ -63,10 +63,10 @@ module Layer = struct
     let backward x g =
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
-      for j = 0 to Matrix.tgt w do
+      for j = 0 to Matrix.tgt w - 1 do
         b.(j) <- b.(j) -. rate *. g.(j);
-        for i = 0 to Matrix.src w do
-          w.(j).(i) <- g.(j) *. x.(i)
+        for i = 0 to Matrix.src w - 1 do
+          w.(j).(i) <- w.(j).(i) -. rate *. g.(j) *. x.(i)
         done
       done;
       Matrix.app (Matrix.transpose w) g
@@ -181,7 +181,7 @@ let fit ?(distance=`Euclidean) ?(precision=1e-3) net dataset =
   in
   let step x y =
     let net = net@[distance y] in
-    List.iter (fun l -> Printf.printf "%d -> %d\n%!" (Layer.src l) (Layer.tgt l)) net;
+    (* List.iter (fun l -> Printf.printf "%d -> %d\n%!" (Layer.src l) (Layer.tgt l)) net; *)
     let o = backward net x in
     if o < precision then raise Exit
   in
