@@ -21,13 +21,28 @@ module Layer = struct
 
   let tgt l = l.outputs
 
+  (** Linear combination of the inputs. *)
+  let linear ?(regularization=0.) ~rate w =
+    let inputs = Matrix.src !w in
+    let outputs = Matrix.tgt !w in
+    let forward x =
+      assert (Vector.dim x = inputs);
+      Matrix.app !w x
+    in
+    let backward x g =
+      assert (Vector.dim x = inputs);
+      assert (Vector.dim g = outputs);
+      let g' = Matrix.tapp !w g in
+      w := Matrix.mapi (fun j i w -> w -. rate *. (g.(j) *. x.(i) +. regularization *. w)) !w;
+      g'
+    in
+    { inputs; outputs; forward; backward }
+
   (** Each output is an affine combination of all the inputs. *)
   let affine ?(regularization=0.) ~rate w b =
-    assert (Matrix.tgt w = Vector.dim b);
-    let inputs = Matrix.src w in
-    let outputs = Matrix.tgt w in
-    let w = ref w in
-    let b = ref b in
+    assert (Matrix.tgt !w = Vector.dim !b);
+    let inputs = Matrix.src !w in
+    let outputs = Matrix.tgt !w in
     let forward x =
       assert (Vector.dim x = inputs);
       Vector.add (Matrix.app !w x) !b
@@ -36,10 +51,8 @@ module Layer = struct
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
       let g' = Matrix.tapp !w g in
-      let b' = Array.mapi (fun j b -> b -. rate *. (g.(j) +. regularization *. b)) !b in
-      let w' = Matrix.mapi (fun j i w -> w -. rate *. (g.(j) *. x.(i) +. regularization *. w)) !w in
-      w := w';
-      b := b';
+      b := Vector.mapi (fun j b -> b -. rate *. (g.(j) +. regularization *. b)) !b;
+      w := Matrix.mapi (fun j i w -> w -. rate *. (g.(j) *. x.(i) +. regularization *. w)) !w;
       g'
     in
     { inputs; outputs; forward; backward }
@@ -156,8 +169,8 @@ let neural ?(activation=`Sigmoid) ~rate layers =
   let layers = List.tl layers in
   let rec aux n = function
     | l::layers ->
-      let w = Matrix.init l n (fun _ _ -> Random.float 2. -. 1.) in
-      let b = Vector.init l (fun _ -> 0.) in
+      let w = Matrix.init l n (fun _ _ -> Random.float 2. -. 1.) |> ref in
+      let b = Vector.init l (fun _ -> 0.) |> ref in
       [Layer.affine ~rate w b; Layer.activation activation l]@(aux l layers)
     | [] -> []
   in
