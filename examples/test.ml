@@ -1,4 +1,4 @@
-open Extlib
+open Nn
 
 let () = Random.self_init ()
 

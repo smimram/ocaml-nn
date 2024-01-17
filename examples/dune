@@ -1,0 +1,12 @@
+(executable
+ (name test)
+ (modules test)
+ (libraries nn)
+)
+
+(rule
+ (alias runtest)
+ (action
+  (run ./test.exe)
+ )
+)
