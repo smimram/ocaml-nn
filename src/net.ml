@@ -2,6 +2,7 @@
 
 open Extlib
 
+(*
 (** Batch references. *)
 module Batch = struct
   type 'a t =
@@ -22,24 +23,24 @@ module Batch = struct
       fold
     }
 
-  let make_float =
+  let float =
     let fold batch =
-      let s, n = List.fold_left (fun (s,n) x -> s+.x, n+1) (0.,0) batch in
-      s /. float n
+      let s, n = List.fold_left (fun (s,n) x -> s+.x, n+1) (List.hd batch, 0) (List.tl batch) in
+      s /. float_of_int n
     in
     make fold
 
-  let make_vector =
+  let vector =
     let fold batch =
       let s, n = List.fold_left (fun (s,n) x -> Vector.add s x, n+1) (List.hd batch, 0) (List.tl batch) in
-      Vector.cmul (1. /. float n) s
+      Vector.cmul (1. /. float_of_int n) s
     in
     make fold
 
-  let make_matrix =
+  let matrix =
     let fold batch =
       let s, n = List.fold_left (fun (s,n) x -> Matrix.add s x, n+1) (List.hd batch, 0) (List.tl batch) in
-      Matrix.cmul (1. /. float n) s
+      Matrix.cmul (1. /. float_of_int n) s
     in
     make fold
 
@@ -62,6 +63,14 @@ module Batch = struct
     let (:=) = set
   end
 end
+*)
+
+module Batch = struct
+  let vector _ = ref
+  let matrix _ = ref
+  let get = (!)
+  let set x v = x := v
+end
 
 (** Layers of a net. *)
 module Layer = struct
@@ -83,21 +92,27 @@ module Layer = struct
   let tgt l = l.outputs
 
   (** Each output is an affine combination of all the inputs. *)
-  let affine ~rate w b =
+  let affine ?(batch=1) ~rate w b =
     assert (Matrix.tgt w = Vector.dim b);
     let inputs = Matrix.src w in
     let outputs = Matrix.tgt w in
+    let w = Batch.matrix batch w in
+    let b = Batch.vector batch b in
     let forward x =
       assert (Vector.dim x = inputs);
+      let w = Batch.get w in
+      let b = Batch.get b in
       Vector.add (Matrix.app w x) b
     in
-    let wt = Matrix.transpose w in
     let backward x g =
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
-      let b' = Array.mapi (fun j b -> b -. rate *. g.(j)) in
-      let w' = Matrix.mapi (fun j i w -> w -. rate *. g.(j) *. x.(i)) in
-      Matrix.app wt g
+      let b' = Array.mapi (fun j b -> b -. rate *. g.(j)) (Batch.get b) in
+      let w' = Matrix.mapi (fun j i w -> w -. rate *. g.(j) *. x.(i)) (Batch.get w) in
+      let g' = Matrix.tapp (Batch.get w) g in
+      Batch.set w w';
+      Batch.set b b';
+      g'
     in
     { inputs; outputs; forward; backward }
     

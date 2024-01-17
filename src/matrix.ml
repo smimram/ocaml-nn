@@ -89,3 +89,8 @@ let mul (a:t) (b:t) =
 let app (f:t) (x:Vector.t) =
   assert (src f = Vector.dim x);
   Vector.init (tgt f) (fun i -> Int.fold (fun s j -> s +. f.(i).(j) *. x.(j)) 0. (src f))
+
+(** Apply the transpose of f to x. *)
+let tapp (f:t) (x:Vector.t) =
+  assert (tgt f = Vector.dim x);
+  Vector.init (src f) (fun i -> Int.fold (fun s j -> s +. f.(j).(i) *. x.(j)) 0. (tgt f))
