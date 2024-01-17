@@ -5,7 +5,7 @@ let sigmoid x = 1. /. (1. +. (exp (-.x)))
 let relu x = max 0. x
 
 (** Step function. *)
-let step x = if x < 0. then 0. else 1.
+let step x = if x <= 0. then 0. else 1.
 
 module List = struct
   include List
