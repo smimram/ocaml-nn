@@ -1,21 +1,9 @@
 open Nn
 
-let () = Random.self_init ()
-
-(* Let's try to learn f(x) = x². *)
 let () =
-  (* Generate dataset. *)
-  let dataset = List.map (fun x -> Vector.scalar x, Vector.scalar (x*.x)) [-1.0; -0.8; -0.6; -0.4; -0.2; 0.0; 0.2; 0.4; 0.6; 0.8; 1.0] in
-
-  (* Train a network with one hidden layer of size 6. *)
-  let net = Net.neural ~batch:11 ~rate:0.2 [1;6;1] in
-  for _ = 0 to 100_000 do
-    Net.fit net dataset
-  done;
-
-  (* Profit. *)
-  let xs = [-1.0; -0.5; 0.0; 0.1; 0.5; 1.] in
-  List.iter
-    (fun x ->
-       Printf.printf "f(%f) = %f instead of %f\n" x (Net.predict net (Vector.scalar x) |> Vector.to_scalar) (x *. x)
-    ) xs
+  (* Test softmax, see
+     https://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/ *)
+  let l = Vector.of_list [1.; 2.; 3.] in
+  Printf.printf "%s -> %s\n%!" (Vector.to_string l) (Vector.to_string (Vector.softmax l));
+  let l = Vector.of_list [1000.; 2000.; 3000.] in
+  Printf.printf "%s -> %s\n%!" (Vector.to_string l) (Vector.to_string (Vector.softmax l))

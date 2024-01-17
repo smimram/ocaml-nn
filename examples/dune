@@ -4,9 +4,24 @@
  (libraries nn)
 )
 
+(executable
+ (name square)
+ (modules square)
+ (libraries nn)
+)
+
+(executable
+ (name char_rnn)
+ (modules char_rnn)
+ (libraries nn)
+)
+
 (rule
  (alias runtest)
  (action
-  (run ./test.exe)
+  (progn
+   (run ./test.exe)
+   (run ./square.exe)
+  )
  )
 )
