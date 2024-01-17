@@ -62,6 +62,9 @@ let sum n f =
 let map f (a:t) : t =
   Array.map (fun r -> Array.map (fun x -> f x) r) a
 
+let mapi f (a:t) : t =
+  Array.mapi (fun j r -> Array.mapi (fun i x -> f j i x) r) a
+
 let map2 f (a:t) (b:t) : t =
   assert (rows a = rows b);
   assert (cols a = cols b);

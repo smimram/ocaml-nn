@@ -6,15 +6,19 @@ open Extlib
 module Batch = struct
   type 'a t =
     {
+      every : int;
       mutable contents : 'a; (** Current contents. *)
       mutable batch : 'a list; (** Future contents. *)
+      mutable batch_length : int;
       fold : 'a list -> 'a; (** Function to collect the values. *)
     }
 
-  let make fold x =
+  let make fold every x =
     {
+      every;
       contents = x;
       batch = [];
+      batch_length = 0;
       fold
     }
 
@@ -25,19 +29,38 @@ module Batch = struct
     in
     make fold
 
+  let make_vector =
+    let fold batch =
+      let s, n = List.fold_left (fun (s,n) x -> Vector.add s x, n+1) (List.hd batch, 0) (List.tl batch) in
+      Vector.cmul (1. /. float n) s
+    in
+    make fold
+
+  let make_matrix =
+    let fold batch =
+      let s, n = List.fold_left (fun (s,n) x -> Matrix.add s x, n+1) (List.hd batch, 0) (List.tl batch) in
+      Matrix.cmul (1. /. float n) s
+    in
+    make fold
+
   let get r = r.contents
 
-  let set r x = r.batch <- x::r.batch
+
+  let collect r =
+    r.contents <- r.fold r.batch;
+    r.batch <- [];
+    r.batch_length <- 0
+  
+  let set r x =
+    r.batch <- x::r.batch;
+    r.batch_length <- r.batch_length + 1;
+    if r.batch_length >= r.every then collect r
 
   module Operations = struct
     let ref x = make x
     let (!) = get
     let (:=) = set
   end
-
-  let collect r =
-    r.contents <- r.fold r.batch;
-    r.batch <- []
 end
 
 (** Layers of a net. *)
@@ -72,12 +95,8 @@ module Layer = struct
     let backward x g =
       assert (Vector.dim x = inputs);
       assert (Vector.dim g = outputs);
-      for j = 0 to Matrix.tgt w - 1 do
-        b.(j) <- b.(j) -. rate *. g.(j);
-        for i = 0 to Matrix.src w - 1 do
-          w.(j).(i) <- w.(j).(i) -. rate *. g.(j) *. x.(i)
-        done
-      done;
+      let b' = Array.mapi (fun j b -> b -. rate *. g.(j)) in
+      let w' = Matrix.mapi (fun j i w -> w -. rate *. g.(j) *. x.(i)) in
       Matrix.app wt g
     in
     { inputs; outputs; forward; backward }
