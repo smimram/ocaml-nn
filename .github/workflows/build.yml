@@ -1,7 +1,5 @@
 name: Build
-
-permissions: read-all
-
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
