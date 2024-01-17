@@ -226,7 +226,7 @@ let backward net x =
   Vector.to_scalar o
 
 (** Train a network on given data. *)
-let fit ?(distance=`Euclidean) ?(precision=1e-3) net dataset =
+let fit ?(distance=`Euclidean) net dataset =
   (* Distance layer. *)
   let distance target =
     match distance with
@@ -236,8 +236,7 @@ let fit ?(distance=`Euclidean) ?(precision=1e-3) net dataset =
     let distance = make [distance y] in
     let net = append net distance in
     (* List.iter (fun l -> Printf.printf "%d -> %d\n%!" (Layer.src l) (Layer.tgt l)) net; *)
-    let o = backward net x in
-    if o < precision then raise Exit
+    ignore (backward net x)
   in
   try List.iter (fun (x,y) -> step x y) dataset
   with Exit -> ()
